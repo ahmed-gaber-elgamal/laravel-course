@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Socialite;
+use App\User;
+use Illuminate\Support\Facades\Auth;
+
+
 class LoginController extends Controller
 {
     /*
@@ -52,6 +56,24 @@ class LoginController extends Controller
         $user = Socialite::driver('github')->user();
 
         // $user->token;
-    }
+        $data = [
+            'name' => $user->getName(),
+            'email' => $user->getEmail(),
+            'password' => $user->token,
+        ];
+        $my_u = User::where('email', '', $user->getEmail())->first();
+        if ($my_u === null) {
+            Auth::login(User::firstOrCreate($data));
+        } else {
+            Auth::login($my_u);
+        }
 
+        return redirect('/posts');
+    }
 }
+
+
+
+    
+
+
